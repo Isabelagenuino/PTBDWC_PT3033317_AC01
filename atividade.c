@@ -1,13 +1,15 @@
-#include <stdio.h> // printf
-#include <stdlib.h> // malloc, atoi, rand, bsearch
-#include <time.h> // clock
-#include <limits.h> //INT_MAX
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <limits.h>
 
 /* Programa que recebe um tamanho de vetor como parâmetro, aloca
 memória para este vetor e preenche-o com números inteiros crescentes,
 com intervaloes pseudoaletórios.
 Mede o tempo para gerar o vetor e o imprime.
-Teste com vários tamanhos até obter tempos entre um e dez segundos.
+Realiza buscas sequencial e binária por NCHAVES valores no vetor e mede o tempo de cada busca.
+Imprime os tempos de busca.
+Teste com vários tamanhos até obter tempos entre um e dez segundos para a geração do vetor.
 */
 
 int compara_int(const void *i1, const void *i2) { // Compara dois inteiros
@@ -16,6 +18,15 @@ int compara_int(const void *i1, const void *i2) { // Compara dois inteiros
 }
 
 #define NCHAVES 5
+
+int busca_sequencial(unsigned int *vetor, size_t n, unsigned int chave) {
+    for (size_t i = 0; i < n; i++) {
+        if (vetor[i] == chave) {
+            return i; // Retorna o índice se encontrado
+        }
+    }
+    return -1; // Retorna -1 se não encontrado
+}
 
 int main(int argc, char *argv[]) {
     clock_t inicio, fim;
@@ -43,11 +54,30 @@ int main(int argc, char *argv[]) {
     }
     fim = clock(); // Marca o tempo final
     // Calcula o tempo decorrido em segundos
-    double segs= ((double) (fim - inicio)) / CLOCKS_PER_SEC;
-    printf("Tempo para gerar o vetor: %g segundos\n", segs);
+    double segs_geracao= ((double) (fim - inicio)) / CLOCKS_PER_SEC;
+    printf("Tempo para gerar o vetor: %g segundos\n", segs_geracao);
 
-    // Insira aqui suas buscas sequenciais e binárias
+    // Busca Sequencial
+    inicio = clock();
+    for (int j = 0; j < NCHAVES; j++) {
+        unsigned int chave_busca_seq = inteiros[rand() % n]; // Escolhe chaves aleatórias dentro do vetor
+        busca_sequencial(inteiros, n, chave_busca_seq);
+    }
+    fim = clock();
+    segs_seq = ((double) (fim - inicio)) / CLOCKS_PER_SEC;
+    printf("Tempo para %d buscas sequenciais: %g segundos\n", NCHAVES, segs_seq);
 
+    // Busca Binária
+    inicio = clock();
+    for (int j = 0; j < NCHAVES; j++) {
+        unsigned int chave_busca_bin = inteiros[rand() % n]; // Escolhe chaves aleatórias dentro do vetor
+        bsearch(&chave_busca_bin, inteiros, n, sizeof(unsigned int), compara_int);
+    }
+    fim = clock();
+    segs_bin = ((double) (fim - inicio)) / CLOCKS_PER_SEC;
+    printf("Tempo para %d buscas binárias: %g segundos\n", NCHAVES, segs_bin);
+
+    free(inteiros); // Libera a memória alocada
     return 0;
 }
 /* int rand(void) gera uma sequência pseudoaleatória de números inteiros.
